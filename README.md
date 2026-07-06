@@ -1,7 +1,4 @@
-# Pyash
-A shell emulator written fully in clean and modular Python code
 
-Markdown
 # 🐚 Pyash (Shell Emulator)
 
 ![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)
