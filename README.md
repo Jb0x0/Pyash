@@ -21,10 +21,10 @@ Whether you are looking for an educational tool to study shell mechanics, a safe
 *  **Colored Output and Output History:** Built-in persistent history (with cross-platform GNU readline fallbacks) and crisp terminal color coding powered by `colorama`.
   
 *  **Battery-Included Utilities:** Native Python rewrites of classic coreutils:
-  * *Navigation & Files:* `cd`, `pwd`, `ls (-a, -l)`, `mkdir`, `rmdir`, `rm`, `touch`, `cp`, `mv`
-  * *Text Processing:* `cat`, `head`, `tail`, `echo` (with `>` and `>>` redirection support)
-  * *System & Info:* `uname`, `uptime`, `whoami`, `date`, `tree`, `chmod`
-  * *Extras:* `fortune`, `dd`, and a localized `man` paging system.
+   * *Navigation & Files:* `cd`, `pwd`, `ls (-a, -l)`, `mkdir`, `rmdir`, `rm`, `touch`, `cp`, `mv`
+   * *Text Processing:* `cat`, `head`, `tail`, `echo` (with `>` and `>>` redirection support)
+   * *System & Info:* `uname`, `uptime`, `whoami`, `date`, `tree`, `chmod`
+   * *Extras:* `fortune`, `dd`, and a localized `man` paging system.
 
 ---
 
