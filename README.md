@@ -32,6 +32,7 @@ Whether you are looking for an educational tool to study shell mechanics, a safe
 
 ##  Prerequisites
 
+Pyash only works on Unix based Operating Systems (so Linux, BSD, MacOS, etc).
 Pyash relies primarily on the Python Standard Library. You only need to install `colorama` for terminal colors:
 
 ```bash
