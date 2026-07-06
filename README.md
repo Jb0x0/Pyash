@@ -24,9 +24,7 @@ Whether you are looking for an educational tool to study shell mechanics, a safe
 
 ---
 
-##  Getting Started
-
-### Prerequisites
+## Prerequisites
 
 Pyash relies primarily on the Python Standard Library. You only need to install `colorama` for terminal colors:
 
@@ -39,5 +37,5 @@ python pyash.py
 
 ```
 
-##  📄 License
+##   License
 Distributed under the MIT License. See LICENSE for more information. This grants you full rights to use, modify, study, and distribute this codebase in both private and commercial environments.
