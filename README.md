@@ -36,6 +36,7 @@ cd pyash
 python pyash.py
 
 ```
+---
 
 ##   License
 Distributed under the MIT License. See LICENSE for more information. This grants you full rights to use, modify, study, and distribute this codebase in both private and commercial environments.
