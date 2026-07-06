@@ -12,7 +12,7 @@ Whether you are looking for an educational tool to study shell mechanics, a safe
 
 ##  Features
 
-*  **Secure Sandbox Environment:** Pyash operates fully in a sandboxed "shell" folder, Pyash leverages `os.path.commonpath` to ensure users absolutely cannot read, write, or navigate to files outside the designated shell root folder.
+*  **Secure Sandbox Environment:** Pyash operates fully in a sandboxed "shell" folder, Pyash specifically leverages `os.path.commonpath` to ensure users absolutely cannot read, write, or navigate to files outside the designated shell root folder.
   
 *  **Command Chaining (`&&`):** Supports sequential execution—if a command fails, the chain safely halts.
   
@@ -30,7 +30,7 @@ Whether you are looking for an educational tool to study shell mechanics, a safe
 
 ---
 
-## Prerequisites
+##  Prerequisites
 
 Pyash relies primarily on the Python Standard Library. You only need to install `colorama` for terminal colors:
 
