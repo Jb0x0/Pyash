@@ -28,6 +28,8 @@ Whether you are looking for an educational tool to study shell mechanics, a safe
    * *System & Info:* `uname`, `uptime`, `whoami`, `date`, `tree`, `chmod`
    * *Extras:* `fortune`, `dd`, and a localized `man` paging system.
 
+Read INSTRUCTIONS.txt for more info.
+
 ---
 
 ##  Prerequisites
