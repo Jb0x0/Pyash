@@ -10,13 +10,13 @@ Whether you are looking for an educational tool to study shell mechanics, a safe
 
 ---
 
-## ✨ Features
+##  Features
 
-* 🔒 **Secure Sandbox Environment:** Leverages `os.path.commonpath` to ensure users absolutely cannot read, write, or navigate to files outside the designated shell root folder.
-* 🔗 **Command Chaining (`&&`):** Supports sequential execution—if a command fails, the chain safely halts.
-* 🚰 **Stream Piping (`|`):** Custom text-stream pipeline architecture allows you to seamlessly pass data across utilities (e.g., `cat file.txt | head`).
-* 🎨 **Beautiful UI & History:** Built-in persistent history (with cross-platform GNU readline fallbacks) and crisp terminal color coding powered by `colorama`.
-* 📦 **Battery-Included Utilities:** Native Python rewrites of classic coreutils:
+*  **Secure Sandbox Environment:** Leverages `os.path.commonpath` to ensure users absolutely cannot read, write, or navigate to files outside the designated shell root folder.
+*  **Command Chaining (`&&`):** Supports sequential execution—if a command fails, the chain safely halts.
+*  **Stream Piping (`|`):** Custom text-stream pipeline architecture allows you to seamlessly pass data across utilities (e.g., `cat file.txt | head`).
+*  **Beautiful UI & History:** Built-in persistent history (with cross-platform GNU readline fallbacks) and crisp terminal color coding powered by `colorama`.
+*  **Battery-Included Utilities:** Native Python rewrites of classic coreutils:
   * *Navigation & Files:* `cd`, `pwd`, `ls (-a, -l)`, `mkdir`, `rmdir`, `rm`, `touch`, `cp`, `mv`
   * *Text Processing:* `cat`, `head`, `tail`, `echo` (with `>` and `>>` redirection support)
   * *System & Info:* `uname`, `uptime`, `whoami`, `date`, `tree`, `chmod`
@@ -24,7 +24,7 @@ Whether you are looking for an educational tool to study shell mechanics, a safe
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 
