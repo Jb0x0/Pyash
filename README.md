@@ -45,7 +45,7 @@ pip install colorama
 ```bash
 git clone https://github.com/Jb0x0/Pyash.git
 cd Pyash/pyash
-python Pyash.py
+python3 Pyash.py
 
 ```
 ---
