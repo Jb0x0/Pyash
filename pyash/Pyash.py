@@ -1,9 +1,9 @@
+# Pyash Version 1.1.0
+# License: MIT License
+
 # This is a shell EMULATOR, it is also restricted to a shell folder, so you can't access files outside of it. This is for security reasons.
 
-# Thinking about making Pyash Emulator a real shell in the future, but for now, this is just a fun shell emulator/simulator.
-# Which is why current mentions of "Pyash" in the code have emul/emulator next to them.
-
-# License: MIT License
+# Please read INSTRUCTIONS.txt (located in the "pyash" folder) if this is your first time using Pyash.
 
 import os
 import sys
@@ -171,6 +171,8 @@ def resolve_setup_path(base_dir, target):
 
 def choose_shell_location():
     current_dir = os.path.abspath(os.getcwd())
+    clear_screen([])
+    print(f"{Fore.BLUE}Please read INSTRUCTIONS.txt if this is your first time using Pyash.")
     print("\nShell folder not found.")
     print("Choose where to create it.")
     print("Commands: cd <dir>, cd .., pwd, ls, select <dir>, quit")
@@ -282,8 +284,6 @@ def setup_shell_dir():
 setup_shell_dir()
 setup_history()
 clear_screen([])
-
-read_run = False
 
 def get_prompt():
     user = os.getenv("USER") or "user"
@@ -609,7 +609,6 @@ def info(args):
     print("Type 'help' for a list of commands.\n")
 
 def man(args):
-    global read_run
     man_pages = {
         'ls': "List directory contents.",
         'cat': "Concatenate and print files.",
@@ -643,8 +642,6 @@ def man(args):
         return
     for cmd in args:
         print(Fore.YELLOW + f"{cmd}" + Style.RESET_ALL + " - " + man_pages.get(cmd, 'No manual entry for ' + cmd))
-        if cmd == 'run' and cmd in man_pages and not read_run:
-            read_run = True
 
 def history(args):
     if not args:
@@ -706,12 +703,6 @@ def dd(args):
         print("dd: input or output file not found.")
     except Exception as e:
         print(f"dd: error: {e}")
-
-def run(args):
-    if read_run:
-        os.system(' '.join(args))
-    else:
-        print("The 'run' command is disabled for security reasons. To enable it, read the 'man run' page.")
 
 def fortune(args):
     quotes = [
@@ -910,7 +901,6 @@ commands = {
     'fortune': fortune,
     'dd': dd,
     'extras': extras,
-    'run': run,
     'chmod': chmod,
 }
 
