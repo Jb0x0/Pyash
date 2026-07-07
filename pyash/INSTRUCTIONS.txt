@@ -14,15 +14,16 @@ General Use:
     "select <dir>" to choose a directory in the directory you're currently in.
     All other commands in the Setup Wizard are self explanatory.
 
-    After completing the Setup Wizard you'll be greeted by the full shell enviorment.
+    After completing the Setup Wizard you'll be greeted by the full shell environment.
     Type "help" to view base commands, type "extras" for the base extras and custom
     commands. Most commands are self explanatory, but local manual pages are available
     for all commands via the "man" command (usage: man <cmd>).
 
 How to add custom commands:
 
-    After completing the Setup Wizard, Pyash automatically creates two  hidden files
+    After completing the Setup Wizard, Pyash automatically creates two hidden files
     in your "shell" folder, ".pyash_history" and ".pyash_extras". To add your own
     custom commands to Pyash, you must edit the ".pyash_extras" file.
-    instructions on how to formate your commands are noted in ".pyash_extras",
+    instructions on how to format your commands are noted in ".pyash_extras",
     it needs to be formated as: <command_name> [package_name]
+
