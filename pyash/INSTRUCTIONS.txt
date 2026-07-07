@@ -1,0 +1,30 @@
+Pyash only works on Unix based Operating Systems (so Linux, BSD, MacOS, etc).
+
+Please ensure that Python and Colorama are installed prior to running Pyash.py
+
+General Use:
+
+    Every time that Pyash.py runs it'll automatically look for a file in your home (~)
+    directory called ".pyash_shell_path", if it doesn't find the file it'll boot into
+    the Setup Wizard.
+
+    Once in the Setup Wizard, you'll be greeted by a basic shell with commands
+    like "cd", "ls", "pwd", "select", etc. To select where to put the "shell"
+    either type "select" to choose the directory that you're currently in, or
+    "select <dir>" to choose a directory in the directory you're currently in.
+    All other commands in the Setup Wizard are self explanatory.
+
+    After completing the Setup Wizard you'll be greeted by the full shell enviorment.
+    Type "help" to view base commands, type "extras" for the base extras and custom
+    commands. Most commands are self explanatory, but local manual pages are available
+    for all commands via the "man" command (usage: man <cmd>).
+
+How to add custom commands:
+
+    After completing the Setup Wizard, Pyash automatically creates two  hidden files
+    in your "shell" folder, ".pyash_history" and ".pyash_extras". To add your own
+    custom commands to Pyash, you must edit the ".pyash_extras" file.
+    instructions on how to formate your commands are noted in ".pyash_extras",
+    just open it in a text editor, it needs to be formated as:
+    <command_name> [package_name]
+
