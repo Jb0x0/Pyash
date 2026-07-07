@@ -26,11 +26,11 @@ Whether you are looking for an educational tool to study shell or Python mechani
   
     | Navigation & Files | Description |
     |---------|-------------|
-    | `cd <directory>` | Change the current directory |
+    | `cd` | Change the current directory |
     | `pwd` | Display the current working directory |
     | `ls (-a, -l)` | List files in the current directory |
     | `mkdir` | Creates a new directory (folder) |
-    | `rmdir <directory>` | Removes an empty directory |
+    | `rmdir` | Removes an empty directory |
     | `rm` | Deletes files or directories |
     | `touch` | Creates a new empty file or changes a file |
     | `cp` | Copies files or directories |
