@@ -14,7 +14,7 @@ Whether you are looking for an educational tool to study shell or Python mechani
 
 *  **Secure Sandbox Environment:** Pyash operates fully in a sandboxed "shell" folder, Pyash specifically leverages `os.path.commonpath` to ensure users absolutely cannot read, write, or navigate to files outside the designated "shell" root folder.
   
-*  **Command Chaining (`&&`):** Supports sequential execution—if a command fails, the chain safely halts.
+*  **Command Chaining (`&&`):** Supports sequential execution and if a command fails, the chain safely halts.
   
 *  **Stream Piping (`|`):** Custom text-stream pipeline architecture allows you to seamlessly pass data across utilities (e.g., `cat file.txt | head`).
   
