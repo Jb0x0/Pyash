@@ -1,4 +1,4 @@
-# Pyash Version 1.1.0
+# Pyash Version 1.1.2
 # License: MIT License
 
 # This is a shell EMULATOR, it is also restricted to a shell folder, so you can't access files outside of it. This is for security reasons.
@@ -199,7 +199,8 @@ def choose_shell_location():
             continue
 
         if choice.lower() in {"quit", "exit"}:
-            return None
+            print("\nExiting shell emulator.")
+            sys.exit(0)
         if choice.lower() == "pwd":
             print(current_dir)
             continue
