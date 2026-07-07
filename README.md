@@ -1,5 +1,5 @@
 
-# 🐚 Pyash (Shell Emulator)
+# 🐍🐚 Pyash (Shell Emulator)
 
 ![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
