@@ -23,11 +23,43 @@ Whether you are looking for an educational tool to study shell or Python mechani
 *  **Support for Extra Commands:** More commands can easily be added by modifying the ".pyash_extras" file that Pyash creates in its "shell" folder
   
 *  **Battery-Included Utilities:** Native Python rewrites of classic coreutils:
-   * *Navigation & Files:* `cd`, `pwd`, `ls (-a, -l)`, `mkdir`, `rmdir`, `rm`, `touch`, `cp`, `mv`
-   * *Text Processing:* `cat`, `head`, `tail`, `echo` (with `>` and `>>` redirection support)
-   * *System & Info:* `uname`, `uptime`, `whoami`, `date`, `tree`, `chmod`
-   * *Extras:* `fortune`, `dd`, and a localized `man` paging system.
+  
+    | Navigation & Files | Description |
+    |---------|-------------|
+    | `cd <directory>` | Change the current directory |
+    | `pwd` | Display the current working directory |
+    | `ls (-a, -l)` | List files in the current directory |
+    | `mkdir` | Creates a new directory (folder) |
+    | `rmdir <directory>` | Removes an empty directory |
+    | `rm` | Deletes files or directories |
+    | `touch` | Creates a new empty file or changes a file |
+    | `cp` | Copies files or directories |
+    | `mv` | Moves or renames files or directories |
 
+    | Text Processing | Description |
+    |---------|-------------|
+    | `cat` | Displays the contents of a file |
+    | `head` | Shows the first lines of a file |
+    | `tail` | Shows the last lines of a file |
+    | `echo (>, >>)` | Prints text to the terminal |
+
+    | System & Info | Description |
+    |---------|-------------|
+    | `uname` | Displays system information |
+    | `uptime` | Shows how long the system has been running |
+    | `whoami` | Shows the current user |
+    | `date` | Displays the current date and time |
+    | `tree` | Displays files and directories in a tree |
+    | `chmod` | Changes file permissions |
+    | `history` | Show previously executed commands |
+    | `exit` | Exit the shell |
+
+    | Extras | Description |
+    |---------|-------------|
+    | `fortune` | Displays a random quote or message |
+    | `dd` | Copies or transforms data at a low level |
+    | `man` | A localized manual paging system |
+   
 
 Read INSTRUCTIONS.txt for more info.
 
