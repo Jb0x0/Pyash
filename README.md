@@ -20,7 +20,7 @@ Whether you are looking for an educational tool to study shell or Python mechani
   
 *  **Colored Output and Output History:** Built-in persistent history (.pyash_history) and crisp terminal color coding powered by `colorama`.
 
-*  **Support for Extra Commands:** More commands can easily be added by modifying the .pyash_extras file that Pyash creates in its "shell" folder
+*  **Support for Extra Commands:** More commands can easily be added by modifying the ".pyash_extras" file that Pyash creates in its "shell" folder
   
 *  **Battery-Included Utilities:** Native Python rewrites of classic coreutils:
    * *Navigation & Files:* `cd`, `pwd`, `ls (-a, -l)`, `mkdir`, `rmdir`, `rm`, `touch`, `cp`, `mv`
