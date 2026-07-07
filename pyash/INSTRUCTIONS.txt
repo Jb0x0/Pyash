@@ -1,6 +1,6 @@
 Pyash only works on Unix based Operating Systems (so Linux, BSD, MacOS, etc).
 
-Please ensure that Python and Colorama are installed prior to running Pyash.py
+Please ensure that Python (3.x) and Colorama are installed prior to running Pyash.py
 
 General Use:
 
@@ -22,8 +22,31 @@ General Use:
 How to add custom commands:
 
     After completing the Setup Wizard, Pyash automatically creates two hidden files
-    in your "shell" folder, ".pyash_history" and ".pyash_extras". To add your own
+    in your "shell" folder, ".pyash_history" and ".pyash_ex# License: MIT Licensetras". To add your own
     custom commands to Pyash, you must edit the ".pyash_extras" file.
     instructions on how to format your commands are noted in ".pyash_extras",
     it needs to be formated as: <command_name> [package_name]
+
+Q&A:
+
+    Q: Will Pyash ever be compatiable with Windows (11, 10, etc)?
+    A: No, there are no current plans to ever port Pyash to Windows,
+       feel free to fork Pyash and make it Windows compatiable if you want
+
+    Q: Will you ever rewrite Pyash in a different coding language?
+    A: No, Python was chosen for a specific reason, for its modularity and extensive
+       Standard Libary.
+
+    Q: Will redownloading Pyash from GitHub to update it mess with my current "shell"
+       directory?
+    A: No, all new Pyash versions (Versions 1.0 and beyond), will be able to access
+       your "shell" directory without causing any issues
+
+    Q: How often will Pyash be updated/improved?
+    A: Decently often, expect updates every few weeks or months. Open GitHub issues
+       and pull request are reviewed every few weeks as well (sometime sooner).
+
+    Q: Am I allowed to fork and modify Pyash?
+    A: Yes, under the MIT License you are allowed full rights to use, modify, study,
+       and distribute the Pyash codebase in both private and commercial environments.
 
