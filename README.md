@@ -42,9 +42,9 @@ Pyash relies primarily on the Python Standard Library. You only need to install 
 ```bash
 pip install colorama
 
-git clone [https://github.com/Jb0x0/pyash.git](https://github.com/Jb0x0/pyash.git)
-cd pyash/pyash
-python pyash.py
+git clone https://github.com/Jb0x0/Pyash.git
+cd Pyash/pyash
+python Pyash.py
 
 ```
 ---
