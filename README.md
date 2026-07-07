@@ -4,7 +4,7 @@
 ![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Pyash** is a feature-rich, highly portable, and deeply customized Unix shell emulator coded entirely in clean modular Python. Designed primarily as a secure sandbox environment, Pyash restricts file operations strictly to a designated "shell" folder, preventing directory traversal and protecting your host machine. 
+**Pyash** is a feature-rich, highly portable, and deeply customizable Unix shell emulator coded entirely in clean modular Python. Designed primarily as a secure sandbox environment, Pyash restricts file operations strictly to a designated "shell" folder, preventing directory traversal and protecting your host machine. 
 
 Whether you are looking for an educational tool to study shell or Python mechanics, a safe terminal environment for a Capture The Flag (CTF) game, or just a fun text-based interface to play with, Pyash delivers a native-feeling terminal experience right in your Python runtime.
 
@@ -18,7 +18,7 @@ Whether you are looking for an educational tool to study shell or Python mechani
   
 *  **Stream Piping (`|`):** Custom text-stream pipeline architecture allows you to seamlessly pass data across utilities (e.g., `cat file.txt | head`).
   
-*  **Colored Output and Output History:** Built-in persistent history (with cross-platform GNU readline fallbacks) and crisp terminal color coding powered by `colorama`.
+*  **Colored Output and Output History:** Built-in persistent history (.pyash_history) and crisp terminal color coding powered by `colorama`.
 
 *  **Support for Extra Commands:** More commands can easily be added by modifying the .pyash_extras file that Pyash creates in its "shell" folder
   
