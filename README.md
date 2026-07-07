@@ -20,7 +20,7 @@ Whether you are looking for an educational tool to study shell mechanics, a safe
   
 *  **Colored Output and Output History:** Built-in persistent history (with cross-platform GNU readline fallbacks) and crisp terminal color coding powered by `colorama`.
 
-*  **Support for Extra Commands:** More commands can easily be added by modifying the .pyash_extras file that Pyash creates in it's "shell" folder
+*  **Support for Extra Commands:** More commands can easily be added by modifying the .pyash_extras file that Pyash creates in its "shell" folder
   
 *  **Battery-Included Utilities:** Native Python rewrites of classic coreutils:
    * *Navigation & Files:* `cd`, `pwd`, `ls (-a, -l)`, `mkdir`, `rmdir`, `rm`, `touch`, `cp`, `mv`
@@ -41,7 +41,8 @@ Pyash relies primarily on the Python Standard Library. You only need to install 
 
 ```bash
 pip install colorama
-
+```
+```bash
 git clone https://github.com/Jb0x0/Pyash.git
 cd Pyash/pyash
 python Pyash.py
