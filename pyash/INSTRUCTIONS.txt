@@ -25,6 +25,4 @@ How to add custom commands:
     in your "shell" folder, ".pyash_history" and ".pyash_extras". To add your own
     custom commands to Pyash, you must edit the ".pyash_extras" file.
     instructions on how to formate your commands are noted in ".pyash_extras",
-    just open it in a text editor, it needs to be formated as:
-    <command_name> [package_name]
-
+    it needs to be formated as: <command_name> [package_name]
