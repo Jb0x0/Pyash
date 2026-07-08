@@ -22,7 +22,7 @@ General Use:
 How to add custom commands:
 
     After completing the Setup Wizard, Pyash automatically creates two hidden files
-    in your "shell" folder, ".pyash_history" and ".pyash_ex# License: MIT Licensetras". To add your own
+    in your "shell" folder, ".pyash_history" and ".pyash_extras". To add your own
     custom commands to Pyash, you must edit the ".pyash_extras" file.
     instructions on how to format your commands are noted in ".pyash_extras",
     it needs to be formated as: <command_name> [package_name]
@@ -39,12 +39,12 @@ Q&A:
 
     Q: Will redownloading Pyash from GitHub to update it mess with my current "shell"
        directory?
-    A: No, all new Pyash versions (Versions 1.0 and beyond), will be able to access
+    A: No, all modern Pyash versions (Versions 1.0 and beyond), will be able to access
        your "shell" directory without causing any issues
 
     Q: How often will Pyash be updated/improved?
     A: Decently often, expect updates every few weeks or months. Open GitHub issues
-       and pull request are reviewed every few weeks as well (sometime sooner).
+       and pull request are reviewed every few weeks as well (sometimes sooner).
 
     Q: Am I allowed to fork and modify Pyash?
     A: Yes, under the MIT License you are allowed full rights to use, modify, study,
