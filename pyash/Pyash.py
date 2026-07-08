@@ -1,4 +1,4 @@
-# Pyash Version 1.1.2
+# Pyash Version 1.2.0
 # License: MIT License
 
 # This is a shell EMULATOR, it is also restricted to a shell folder, so you can't access files outside of it. This is for security reasons.
@@ -17,15 +17,67 @@ import platform
 import io
 import atexit
 from contextlib import redirect_stdout
-from colorama import Fore, Style, init
 from datetime import datetime
+
+try:
+    import pyim  # This displays an error in most IDEs/Text editors, but as long as the pyim.py file is in the same directory/folder as this file, it can be imported.
+except ImportError:
+    class _PyimFallback:
+        @staticmethod
+        def set_safe_path(*args, **kwargs):
+            return None
+
+        @staticmethod
+        def pyim(args=None):
+            print("pyim: pyim.py not found")
+
+    pyim = _PyimFallback()
+
+try:
+    from colorama import Fore as ColoramaFore, Style as ColoramaStyle, init as colorama_init
+    _COLORAMA_AVAILABLE = True
+except ImportError:
+    _COLORAMA_AVAILABLE = False
+
+    class _ColorFallback:
+        def __getattr__(self, name):
+            return ""
+
+    ColoramaFore = _ColorFallback()
+    ColoramaStyle = _ColorFallback()
+
+    def colorama_init(*args, **kwargs):
+        return None
+
+Fore = ColoramaFore
+Style = ColoramaStyle
+COLORAMA_ENABLED = _COLORAMA_AVAILABLE
+
+
+def set_colorama_enabled(enabled):
+    global Fore, Style, COLORAMA_ENABLED
+    if enabled and _COLORAMA_AVAILABLE:
+        from colorama import Fore as ColoramaFore, Style as ColoramaStyle
+        Fore = ColoramaFore
+        Style = ColoramaStyle
+    else:
+        class _ColorFallback:
+            def __getattr__(self, name):
+                return ""
+
+        Fore = _ColorFallback()
+        Style = _ColorFallback()
+
+    COLORAMA_ENABLED = enabled and _COLORAMA_AVAILABLE
+    colorama_init(autoreset=True)
+    return COLORAMA_ENABLED
 
 try:
     import readline
 except ImportError:
     readline = None
 
-init(autoreset=True)
+set_colorama_enabled(COLORAMA_ENABLED)
 
 command_history = []
 shell_root = ""
@@ -144,6 +196,9 @@ def safe_path(target):
     return resolved_target
 
 
+pyim.set_safe_path(safe_path)
+
+
 def read_shell_config():
     if not os.path.exists(SHELL_CONFIG_FILE):
         return None
@@ -178,75 +233,79 @@ def choose_shell_location():
     print("Commands: cd <dir>, cd .., pwd, ls, select <dir>, quit")
 
     while True:
-        print(f"\nCurrent directory: {current_dir}")
         try:
-            entries = sorted(
-                entry for entry in os.listdir(current_dir)
-                if os.path.isdir(os.path.join(current_dir, entry))
+            print(f"\nCurrent directory: {current_dir}")
+            try:
+                entries = sorted(
+                    entry for entry in os.listdir(current_dir)
+                    if os.path.isdir(os.path.join(current_dir, entry))
             )
-        except OSError:
-            entries = []
+            except OSError:
+                entries = []
 
-        for entry in entries:
-            print(f"  {Fore.BLUE}{entry}/{Style.RESET_ALL}")
+            for entry in entries:
+                print(f"  {Fore.BLUE}{entry}/{Style.RESET_ALL}")
 
-        if not entries:
-            print(f"{Fore.GREEN}Directory empty{Style.RESET_ALL}")
+            if not entries:
+                print(f"{Fore.GREEN}Directory empty{Style.RESET_ALL}")
 
-        print()
-        choice = input("shell-setup> ").strip()
-        if not choice:
-            continue
+            print()
+            choice = input("shell-setup> ").strip()
+            if not choice:
+                continue
 
-        if choice.lower() in {"quit", "exit"}:
+            if choice.lower() in {"quit", "exit"}:
+                print("\nExiting shell emulator.")
+                sys.exit(0)
+            if choice.lower() == "pwd":
+                print(current_dir)
+                continue
+            if choice.lower() == "ls":
+                continue
+            if choice.lower() in {"list", "dir"}:
+                print("Unknown command. Use 'ls' for a directory listing.")
+                continue
+            if choice.lower() == "select":
+                return current_dir
+
+            if choice.lower().startswith("select "):
+                target = choice[7:].strip()
+                if not target:
+                    continue
+                target_path = resolve_setup_path(current_dir, target)
+                if not os.path.exists(target_path):
+                    print(f"select: {target}: No such file or directory")
+                    continue
+                if not os.path.isdir(target_path):
+                    print(f"select: {target}: Not a directory")
+                    continue
+                current_dir = target_path
+                print(f"Selected {current_dir}")
+                return current_dir
+
+            if choice.startswith("cd "):
+                target = choice[3:].strip()
+                if not target:
+                    continue
+                target_path = resolve_setup_path(current_dir, target)
+                if not os.path.exists(target_path):
+                    print(f"cd: {target}: No such file or directory")
+                    continue
+                if not os.path.isdir(target_path):
+                    print(f"cd: {target}: Not a directory")
+                    continue
+                current_dir = target_path
+                continue
+
+            if choice == "cd ..":
+                current_dir = os.path.dirname(current_dir) or "/"
+                continue
+
+            print("Unknown command. Use 'cd <dir>', 'cd ..', 'pwd', 'ls', 'select', or 'quit'.")
+        
+        except KeyboardInterrupt:
             print("\nExiting shell emulator.")
             sys.exit(0)
-        if choice.lower() == "pwd":
-            print(current_dir)
-            continue
-        if choice.lower() == "ls":
-            continue
-        if choice.lower() in {"list", "dir"}:
-            print("Unknown command. Use 'ls' for a directory listing.")
-            continue
-        if choice.lower() == "select":
-            return current_dir
-
-        if choice.lower().startswith("select "):
-            target = choice[7:].strip()
-            if not target:
-                continue
-            target_path = resolve_setup_path(current_dir, target)
-            if not os.path.exists(target_path):
-                print(f"select: {target}: No such file or directory")
-                continue
-            if not os.path.isdir(target_path):
-                print(f"select: {target}: Not a directory")
-                continue
-            current_dir = target_path
-            print(f"Selected {current_dir}")
-            return current_dir
-
-        if choice.startswith("cd "):
-            target = choice[3:].strip()
-            if not target:
-                continue
-            target_path = resolve_setup_path(current_dir, target)
-            if not os.path.exists(target_path):
-                print(f"cd: {target}: No such file or directory")
-                continue
-            if not os.path.isdir(target_path):
-                print(f"cd: {target}: Not a directory")
-                continue
-            current_dir = target_path
-            continue
-
-        if choice == "cd ..":
-            current_dir = os.path.dirname(current_dir) or "/"
-            continue
-
-        print("Unknown command. Use 'cd <dir>', 'cd ..', 'pwd', 'ls', 'select', or 'quit'.")
-
 
 def setup_shell_dir():
     global shell_root
@@ -285,6 +344,10 @@ def setup_shell_dir():
 setup_shell_dir()
 setup_history()
 clear_screen([])
+
+if not _COLORAMA_AVAILABLE:
+    print("!!! Colorama not detected !!!\n\nTerminal will not have colored output. Install colorama for colored output.\n")
+
 
 def get_prompt():
     user = os.getenv("USER") or "user"
@@ -607,7 +670,7 @@ def date(args):
 
 def info(args):
     print(Fore.GREEN + "\n|| Pyash Emulator ||\n")
-    print("Type 'help' for a list of commands.\n")
+    print(f"{Fore.WHITE}Type 'help' for a list of commands.\n")
 
 def man(args):
     man_pages = {
@@ -717,7 +780,7 @@ def fortune(args):
         "The best way to predict the future is to invent it.",
         "To err is human, but to really foul things up you need a computer.",
         "Linux is free! (Free as in freedom, not free beer.)",
-        "BSD is free! (Free as in free use, not free beer.)",
+        "BSD is free! (Free as in free speech, not free beer.)",
         "Python is the best language for everything, except when it's not.",
         "when's the full rewrite of the code in pure Machine Code coming???"
     ]
@@ -784,6 +847,16 @@ def missing_command(command_name, package_name=None):
     print(f"\n{command_name}: command not found.")
     print(f"Perhaps the package listed in .pyash_extras is missing/mistyped? Package: {package_name}\n")
 
+
+def toggle_colorama(args):
+    new_state = not COLORAMA_ENABLED
+    if new_state and not _COLORAMA_AVAILABLE:
+        print("toggle_colorama: Colorama is not available")
+        return
+
+    set_colorama_enabled(new_state)
+    status = "enabled" if COLORAMA_ENABLED else "disabled"
+    print(f"toggle_colorama: Colorama {status}")
 
 
 def destroy_shell(args):
@@ -907,6 +980,8 @@ commands = {
 
 base_extra_commands = {
     'destroy_shell': destroy_shell,
+    'toggle_colorama': toggle_colorama,
+    'pyim': pyim.pyim,
 }
 custom_extra_commands = {}
 extra_commands = dict(base_extra_commands)
