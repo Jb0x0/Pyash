@@ -2,6 +2,9 @@ Pyash only works on Unix based Operating Systems (so Linux, BSD, MacOS, etc).
 
 Please ensure that Python (3.x) and Colorama are installed prior to running Pyash.py
 
+(As of Pyash v1.2.0, colorama is now optional) 
+(but still highly recommended if you want colored output)
+
 General Use:
 
     Every time that Pyash.py runs it'll automatically look for a file in your home (~)
