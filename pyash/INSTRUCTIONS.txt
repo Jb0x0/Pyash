@@ -19,6 +19,11 @@ General Use:
     commands. Most commands are self explanatory, but local manual pages are available
     for all commands via the "man" command (usage: man <cmd>).
 
+    Pyash has support for running ".sh" Bash files, simply be in the same directory
+    as the ".sh" file and type: "chmod +x example.sh" then type: "./example.sh".
+    You can edit ".sh" files or any other text files with the built in text editor:
+    "Pyim". (usage: pyim <file>)
+
 How to add custom commands:
 
     After completing the Setup Wizard, Pyash automatically creates two hidden files
@@ -49,4 +54,3 @@ Q&A:
     Q: Am I allowed to fork and modify Pyash?
     A: Yes, under the MIT License you are allowed full rights to use, modify, study,
        and distribute the Pyash codebase in both private and commercial environments.
-
