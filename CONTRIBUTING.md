@@ -46,4 +46,4 @@ Please:
 
 ---
 
-**By submitting a contribution, you agree that your work can be included in this project under the project's MIT license.**
+**By submitting a contribution, you agree that your work can be included in this project under the project's MIT license. See LICENSE for more information.**
