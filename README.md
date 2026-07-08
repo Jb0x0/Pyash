@@ -57,6 +57,7 @@ Whether you are looking for an educational tool to study shell or Python mechani
     | Extras | Description |
     |---------|-------------|
     | `fortune` | Displays a random quote or message |
+    | `pyim` | A line-based text editor built for Pyash |
     | `dd` | Copies or transforms data at a low level |
     | `man` | A localized manual paging system |
    
