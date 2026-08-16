@@ -62,7 +62,7 @@ Whether you are looking for an educational tool to study shell or Python mechani
     | `man` | A localized manual paging system |
    
 
-Read INSTRUCTIONS.txt for more info.
+Read [INSTRUCTIONS.txt](https://github.com/Jb0x0/Pyash/blob/main/pyash/INSTRUCTIONS.txt) for more info.
 
 ---
 
