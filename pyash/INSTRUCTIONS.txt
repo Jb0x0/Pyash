@@ -1,8 +1,8 @@
-Pyash only works on Unix based Operating Systems (so Linux, BSD, MacOS, etc).
+Pyash only works on Unix-like Operating Systems (so Linux, BSD, MacOS, etc).
 
 Please ensure that Python (3.x) and Colorama are installed prior to running Pyash.py
 
-(As of Pyash v1.2.0, colorama is now optional) 
+(As of Pyash v1.2.0, colorama is now optional)
 (but still highly recommended if you want colored output)
 
 General Use:
@@ -33,7 +33,27 @@ How to add custom commands:
     in your "shell" folder, ".pyash_history" and ".pyash_extras". To add your own
     custom commands to Pyash, you must edit the ".pyash_extras" file.
     instructions on how to format your commands are noted in ".pyash_extras",
-    it needs to be formated as: <command_name> [package_name]
+    it needs to be formated as: <command_name> [package_name]#
+
+INTENTIONAL SANDBOX BYPASSES:
+
+    Two features deliberately step outside the sandbox and are NOT restricted in
+    what they can do once they run. This is by design to add more functionality, not a
+    bug:
+
+    1. ./script.sh execution - the script file must resolve to a location
+      inside the shell folder, but once launched it runs under a real system
+      bash with no further restriction. It can read, write, or execute
+      anything your real user account has permission to touch.
+
+    2. "extras" (configured via ".pyash_extras") - lets you register a command
+      name that maps to any real executable on your system (e.g. vim,
+      python3, or even bash itself). These run as ordinary, unsandboxed
+      system processes.
+
+    Only place/run .sh scripts, and only register extras, that you trust
+    completely, they have exactly the same power as running them directly in
+    a normal terminal, sandbox folder or not.
 
 Q&A:
 
