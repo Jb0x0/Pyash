@@ -1,4 +1,4 @@
-# Pyim Version 1.0.0
+# Pyim Version 1.1.0
 # License: MIT License
 
 # Pyim is an optional built-in text editor for Pyash. 
@@ -89,8 +89,9 @@ def pyim(args):
             _emit("\npyim: aborted")
             return
 
-        if not raw_command:
+        if not raw_command.strip():
             continue
+        raw_command = raw_command.strip()
 
         if raw_command in {":q", ":x", "q", "x", ":quit", ":exit", "quit", "exit"}:
             return
@@ -102,7 +103,15 @@ def pyim(args):
                 return
             continue
 
-        parts = shlex.split(raw_command)
+        try:
+            parts = shlex.split(raw_command)
+        except ValueError as exc:
+            _emit(f"pyim: syntax error: {exc}")
+            continue
+
+        if not parts:
+            continue
+
         cmd = parts[0]
 
         if cmd == "help":
@@ -139,19 +148,13 @@ def pyim(args):
                 _emit(f"pyim: {cmd}: line number out of range")
                 continue
 
-            text = raw_command.split(None, 2)[2] if len(raw_command.split(None, 2)) > 2 else ""
+            text = " ".join(parts[2:]) if len(parts) > 2 else ""
 
             if cmd == "d":
-                if line_number > len(lines):
-                    _emit("pyim: d: line number out of range")
-                    continue
                 del lines[line_number - 1]
                 continue
 
             if cmd == "r":
-                if line_number > len(lines):
-                    _emit("pyim: r: line number out of range")
-                    continue
                 lines[line_number - 1] = text
                 continue
 
@@ -173,4 +176,4 @@ def pyim(args):
             lines = [line.replace(old, new) for line in lines]
             continue
 
-        print(f"pyim: unknown command: {cmd}")
+        _emit(f"pyim: unknown command: {cmd}")
