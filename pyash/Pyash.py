@@ -18,6 +18,7 @@ import io
 import atexit
 from contextlib import redirect_stdout
 from datetime import datetime
+from time import monotonic
 
 try:
     import pyim  # This displays an error in most IDEs/Text editors, but as long as the pyim.py file is in the same directory/folder as this file, it can be imported.
@@ -81,6 +82,7 @@ set_colorama_enabled(COLORAMA_ENABLED)
 
 command_history = []
 shell_root = ""
+START_TIME = monotonic()
 SHELL_CONFIG_FILE = os.path.join(os.path.expanduser("~"), ".pyash_shell_path")
 HISTORY_FILE = None
 
@@ -647,10 +649,16 @@ def tail(args):
             print(f"tail: cannot open '{filename}': No such file")
 
 def uptime(args):
-    fake_uptime = random.randint(1, 10000)
-    hours = fake_uptime // 3600
-    minutes = (fake_uptime % 3600) // 60
-    print(f" {hours}:{minutes:02d},  1 user,  load average: 0.00, 0.01, 0.05")
+    elapsed = int(monotonic() - START_TIME)
+    days, remainder = divmod(elapsed, 86400)
+    hours, remainder = divmod(remainder, 3600)
+    minutes, _ = divmod(remainder, 60)
+
+    if days:
+        print(f" up {day} day{'s' if days != 1 else ''}, "
+              f"{hours}:{minutes:.02d}")
+    else:
+        print(f" up {hours}:{minutes:02d}")
 
 def uname(args):
     print(f"{platform.system()} pyash-emul {platform.release()}")
