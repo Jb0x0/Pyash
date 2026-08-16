@@ -1,7 +1,28 @@
-# Pyash Version 1.2.0
+# Pyash Version 1.2.1
 # License: MIT License
 
-# This is a shell EMULATOR, it is also restricted to a shell folder, so you can't access files outside of it. This is for security reasons.
+# This is a shell EMULATOR, it is also restricted to a shell folder, so you can't access files outside of it via the emulator's built-in commands. This is for security reasons.
+
+
+# INTENTIONAL SANDBOX BYPASSES:
+#
+# Two features deliberately step outside the sandbox and are NOT restricted in
+# what they can do once they run. This is by design to add more functionality, not a bug:
+#
+#   1. ./script.sh execution - the script file must resolve to a location
+#      inside the shell folder, but once launched it runs under a real system
+#      bash with no further restriction. It can read, write, or execute
+#      anything your real user account has permission to touch.
+#
+#   2. "extras" (configured via ".pyash_extras") - lets you register a command
+#      name that maps to any real executable on your system (e.g. vim,
+#      python3, or even bash itself). These run as ordinary, unsandboxed
+#      system processes.
+#
+# Only place/run .sh scripts, and only register extras, that you trust
+# completely, they have exactly the same power as running them directly in
+# a normal terminal, sandbox folder or not.
+
 
 # Please read INSTRUCTIONS.txt (located in the "pyash" folder) if this is your first time using Pyash.
 
@@ -354,7 +375,9 @@ if not _COLORAMA_AVAILABLE:
 def get_prompt():
     user = os.getenv("USER") or "user"
     host = "pyash-emul"
-    cwd = os.getcwd().replace(shell_root, "~")
+    cwd = os.getcwd()
+    if shell_root and (cwd == shell_root or cwd.startswith(shell_root + os.sep)):
+        cwd = "~" + cwd[len(shell_root):]
     return f"{Fore.GREEN}{user}@{host}{Style.RESET_ALL}:{Fore.BLUE}{cwd}{Style.RESET_ALL}$ "
 
 def ls(args):
@@ -595,7 +618,9 @@ def mv(args):
             dest_path = destination_path
 
         if os.path.exists(dest_path):
-            response = input(f"mv: overwrite '{dest_path}'? [y/N] ").lower()
+            sys.__stdout__.write(f"mv: overwrite '{dest_path}'? [y/N] ")
+            sys.__stdout__.flush()
+            response = input().strip().lower()
             if response != 'y':
                 print(f"mv: not overwriting '{dest_path}'")
                 continue
@@ -655,8 +680,8 @@ def uptime(args):
     minutes, _ = divmod(remainder, 60)
 
     if days:
-        print(f" up {day} day{'s' if days != 1 else ''}, "
-              f"{hours}:{minutes:.02d}")
+        print(f" up {days} day{'s' if days != 1 else ''}, "
+              f"{hours}:{minutes:02d}")
     else:
         print(f" up {hours}:{minutes:02d}")
 
@@ -707,7 +732,6 @@ def man(args):
         'uname': "Show system information.",
         'extras': "Shows a list of third party commands.",
         'dd': "Convert and copy a file.",
-        'run': "Run a command in the system shell. \n\n(WARNING: can run ANY command on your ACTUAL system/shell, even outside the shell folder)",
     }
     if not args:
         print("What manual page do you want?")
@@ -759,10 +783,6 @@ def dd(args):
 
     if not if_file or not of_file:
         print("dd: missing operand")
-        return
-
-    if any(path.startswith(('/dev/', '/sys/')) for path in (if_file, of_file)):
-        print("dd: Permission denied (access to system devices blocked in emulator)")
         return
 
     try:
@@ -929,7 +949,25 @@ def get_custom_extras():
 def create_extra_command_runner(command_name, package_name):
     def runner(args):
         try:
-            subprocess.run([command_name] + args, cwd=shell_root)
+            if sys.stdout is sys.__stdout__:
+                # Needed for interactive tools like vim/nano to work at all.
+                subprocess.run([command_name] + args, cwd=shell_root)
+            else:
+                # Being captured, e.g. inside a `cmd1 | extra_cmd | cmd2`
+                stdin_data = None
+                try:
+                    if not sys.stdin.isatty():
+                        stdin_data = sys.stdin.read()
+                except (AttributeError, ValueError, OSError):
+                    stdin_data = None
+                result = subprocess.run(
+                    [command_name] + args, cwd=shell_root,
+                    input=stdin_data, capture_output=True, text=True
+                )
+                if result.stdout:
+                    sys.stdout.write(result.stdout)
+                if result.stderr:
+                    sys.stdout.write(result.stderr)
         except FileNotFoundError:
             missing_command(command_name, package_name)
     return runner
@@ -996,25 +1034,53 @@ extra_commands = dict(base_extra_commands)
 reload_extra_commands()
 
 
+def is_sh_command(cmd):
+    return cmd.startswith('./') and cmd.endswith('.sh')
+
+
+def run_shell_script(cmd, args, input_data=None, capture=False):
+    """
+    Locate and execute a ./*.sh command.
+
+    NOTE: UNSANDBOXED, read disclamer at top of file.
+
+    Returns:
+        capture=True:  captured stdout (str) on success, None on failure.
+        capture=False: True on success (exit code 0), False otherwise.
+    """
+    fail = None if capture else False
+
+    try:
+        script_path = safe_path(cmd)
+    except PermissionError:
+        print(f"{cmd}: Permission denied or file not found.")
+        return fail
+
+    if not os.path.isfile(script_path):
+        print(f"{cmd}: Permission denied or file not found.")
+        return fail
+
+    try:
+        if capture:
+            result = subprocess.run(["bash", script_path] + args, input=input_data, text=True, capture_output=True)
+            if result.returncode != 0:
+                if result.stderr:
+                    print(result.stderr, end='')
+                return None
+            return result.stdout
+        else:
+            result = subprocess.run(["bash", script_path] + args)
+            return result.returncode == 0
+    except FileNotFoundError:
+        print("\nbash: command not found.")
+        return fail
+
+
 def run_command(cmd, args, input_data=None):
     reload_extra_commands()
 
-    if cmd.startswith('./') and cmd.endswith('.sh'):
-        script_path = os.path.abspath(cmd)
-        if script_path.startswith(shell_root) and os.path.isfile(script_path):
-            try:
-                result = subprocess.run(["bash", script_path] + args, input=input_data, text=True, capture_output=True)
-                if result.returncode != 0:
-                    if result.stderr:
-                        print(result.stderr, end='')
-                    return None
-                return result.stdout
-            except FileNotFoundError:
-                print("\nbash: command not found.")
-                return None
-        else:
-            print(f"{cmd}: Permission denied or file not found.")
-            return None
+    if is_sh_command(cmd):
+        return run_shell_script(cmd, args, input_data=input_data, capture=True)
 
     original_stdin = sys.stdin
     try:
@@ -1054,18 +1120,8 @@ def main():
                         continue
                     cmd, *args = parts
 
-                    if cmd.startswith('./') and cmd.endswith('.sh'):
-                        script_path = os.path.abspath(cmd)
-                        if script_path.startswith(shell_root) and os.path.isfile(script_path):
-                            try:
-                                result = subprocess.run(["bash", script_path] + args)
-                                if result.returncode != 0:
-                                    break
-                            except FileNotFoundError:
-                                print("\nbash: command not found.")
-                                break
-                        else:
-                            print(f"{cmd}: Permission denied or file not found.")
+                    if is_sh_command(cmd):
+                        if not run_shell_script(cmd, args):
                             break
 
                     elif cmd in commands:
@@ -1108,15 +1164,8 @@ def main():
             cmd, *args = parts
             reload_extra_commands()
 
-            if cmd.startswith('./') and cmd.endswith('.sh'):
-                script_path = os.path.abspath(cmd)
-                if script_path.startswith(shell_root) and os.path.isfile(script_path):
-                    try:
-                        subprocess.run(["bash", script_path] + args)
-                    except FileNotFoundError:
-                        print("\nbash: command not found.")
-                else:
-                    print(f"{cmd}: Permission denied or file not found.")
+            if is_sh_command(cmd):
+                run_shell_script(cmd, args)
                 continue
 
             if cmd in commands:
@@ -1133,6 +1182,15 @@ def main():
         except KeyboardInterrupt:
             print("\nExiting shell emulator.")
             break
+        except EOFError:
+            print("\nExiting shell emulator.")
+            break
+        except ValueError as exc:
+            # e.g. shlex.split() on an unterminated quote
+            print(f"pyash: syntax error: {exc}")
+        except Exception as exc:
+            # Never let a bug in a command take the whole shell down.
+            print(f"pyash: unexpected error: {exc}")
 
 if __name__ == "__main__":
     main()
