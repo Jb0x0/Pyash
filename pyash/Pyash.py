@@ -1,28 +1,20 @@
-# Pyash Version 1.2.1
+# Pyash Version 1.2.5
 # License: MIT License
 
 # This is a shell EMULATOR, it is also restricted to a shell folder, so you can't access files outside of it via the emulator's built-in commands. This is for security reasons.
 
-
-# INTENTIONAL SANDBOX BYPASSES:
+# INTENTIONAL SANDBOX BYPASS:
 #
-# Two features deliberately step outside the sandbox and are NOT restricted in
-# what they can do once they run. This is by design to add more functionality, not a bug:
+# One feature deliberately steps outside the sandbox and is NOT restricted in
+# what it can do once it runs. This is by design to add more functionality, not a bug:
 #
-#   1. ./script.sh execution - the script file must resolve to a location
-#      inside the shell folder, but once launched it runs under a real system
-#      bash with no further restriction. It can read, write, or execute
-#      anything your real user account has permission to touch.
+#   "extras" (configured via ".pyash_extras") - lets you register a command
+#   name that maps to any real executable on your system (e.g. vim,
+#   python3, or even bash itself). These run as ordinary, unsandboxed
+#   system processes.
 #
-#   2. "extras" (configured via ".pyash_extras") - lets you register a command
-#      name that maps to any real executable on your system (e.g. vim,
-#      python3, or even bash itself). These run as ordinary, unsandboxed
-#      system processes.
-#
-# Only place/run .sh scripts, and only register extras, that you trust
-# completely, they have exactly the same power as running them directly in
-# a normal terminal, sandbox folder or not.
-
+# Only register extras that you trust completely, they have exactly the same
+# power as running them directly in a normal terminal, sandbox folder or not.
 
 # Please read INSTRUCTIONS.txt (located in the "pyash" folder) if this is your first time using Pyash.
 
@@ -106,6 +98,9 @@ shell_root = ""
 START_TIME = monotonic()
 SHELL_CONFIG_FILE = os.path.join(os.path.expanduser("~"), ".pyash_shell_path")
 HISTORY_FILE = None
+# Parsed live from .pyashrc by read_pyashrc() (see reload_extra_commands()).
+# Default matches "no directives uncommented", i.e. nothing disabled.
+pyashrc_settings = {"no_extras": False}
 
 
 def setup_history():
@@ -732,6 +727,20 @@ def man(args):
         'uname': "Show system information.",
         'extras': "Shows a list of third party commands.",
         'dd': "Convert and copy a file.",
+        'pysh': "Run a ./name.pysh script - Pyash's own script format (one command per "
+                "line, '#' comments allowed). Requires chmod +x. Runs fully sandboxed: "
+                "every line is dispatched through Pyash's normal command logic.",
+        'pyashrc': "Edit .pyashrc in the shell folder to toggle directives, e.g. "
+                   "uncommenting '--no_extras' disables user added .pyash_extras commands.",
+        'pyim': "Built-in extra: launch Pyash's own line based text editor.",
+        'toggle_colorama': "Built-in extra: toggle colored output on or off.",
+        'destroy_shell': "Built-in extra: permanently delete the current shell folder "
+                          "and everything in it, after confirmation.",
+        '.pyash_extras': "File in the shell folder listing user-added extra commands, "
+                          "one per line as '<command_name> [package_name]'. Disable all "
+                          "of them at once via '--no_extras' in .pyashrc.",
+        '.pyash_history': "File in the shell folder storing your command history "
+                           "(what the 'history' command reads from)."
     }
     if not args:
         print("What manual page do you want?")
@@ -946,6 +955,53 @@ def get_custom_extras():
     return entries
 
 
+PYASHRC_DEFAULT_CONTENT = (
+    "# Pyash RC file\n"
+    "# Uncomment a directive below to enable it.\n"
+    "\n"
+    "#--no_extras\n"
+)
+
+
+def ensure_pyashrc_file():
+    rc_path = os.path.join(shell_root, ".pyashrc")
+    try:
+        if not os.path.exists(rc_path):
+            with open(rc_path, "a", encoding="utf-8") as handle:
+                handle.write(PYASHRC_DEFAULT_CONTENT)
+    except OSError:
+        pass
+    return rc_path
+
+
+def read_pyashrc():
+    """
+    Read and parse .pyashrc from the shell folder into a settings dict.
+
+    Returns a dict (e.g. {"no_extras": True/False}) rather than a single bool
+    so more directives can be added later without reworking the parser.
+
+    If .pyashrc is missing (e.g. a shell folder created before this feature
+    existed), this creates the default file on the fly and falls back to
+    default settings (nothing disabled) instead of crashing, consistent
+    with how ensure_extras_file()/get_custom_extras() handle a missing
+    .pyash_extras.
+    """
+    settings = {"no_extras": False}
+    rc_path = ensure_pyashrc_file()
+    try:
+        with open(rc_path, "r", encoding="utf-8") as handle:
+            for raw_line in handle:
+                line = raw_line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                if line == "--no_extras":
+                    settings["no_extras"] = True
+    except OSError:
+        pass
+    return settings
+
+
 def create_extra_command_runner(command_name, package_name):
     def runner(args):
         try:
@@ -974,8 +1030,19 @@ def create_extra_command_runner(command_name, package_name):
 
 
 def reload_extra_commands():
-    global extra_commands, custom_extra_commands
+    global extra_commands, custom_extra_commands, pyashrc_settings
+    # Rereads .pyashrc live, same as .pyash_extras below.
+    pyashrc_settings = read_pyashrc()
+
     extra_commands = dict(base_extra_commands)
+
+    if pyashrc_settings.get("no_extras"):
+        # --no_extras only turns off user-added commands from .pyash_extras.
+        # Pyash's own built-ins (destroy_shell, toggle_colorama, pyim) live in
+        # base_extra_commands above and are always kept.
+        custom_extra_commands = {}
+        return
+
     custom_extra_commands = get_custom_extras()
     for command_name, package_name in custom_extra_commands.items():
         if command_name in extra_commands:
@@ -1034,19 +1101,37 @@ extra_commands = dict(base_extra_commands)
 reload_extra_commands()
 
 
-def is_sh_command(cmd):
-    return cmd.startswith('./') and cmd.endswith('.sh')
+def is_pysh_command(cmd):
+    return cmd.startswith('./') and cmd.endswith('.pysh')
 
 
-def run_shell_script(cmd, args, input_data=None, capture=False):
+def run_pysh_script(cmd, args, input_data=None, capture=False):
     """
-    Locate and execute a ./*.sh command.
+    Locate and execute a ./*.pysh script.
 
-    NOTE: UNSANDBOXED, read disclamer at top of file.
+    .pysh files are read as plain text (one Pyash command per line) and
+    each line is dispatched through execute_input_line() - the exact same
+    function that drives main()'s interactive loop. That means every line is
+    still bound by safe_path() and the sandbox exactly as if it had been
+    typed interactively.
+
+    Like a real shell script, the file must have its execute bit set
+    (checked via os.access(..., os.X_OK)); users set this with the existing
+    `chmod` command.
+
+    Failure behavior (documented here, since it's a deliberate default):
+    lines are independent statements executed in sequence - one failing
+    command does NOT stop the rest of the script, mirroring a sequence of
+    commands typed interactively one after another. The one exception is a
+    line that is itself an && chain: that chain's own stop-on-first-failure
+    behavior (see execute_input_line()) still applies, but only to that line.
 
     Returns:
         capture=True:  captured stdout (str) on success, None on failure.
-        capture=False: True on success (exit code 0), False otherwise.
+        capture=False: True on success (script found & executable and ran),
+                        False otherwise. This reflects whether the script
+                        itself could be launched, not whether every line in
+                        it individually succeeded (see failure behavior above).
     """
     fail = None if capture else False
 
@@ -1060,27 +1145,53 @@ def run_shell_script(cmd, args, input_data=None, capture=False):
         print(f"{cmd}: Permission denied or file not found.")
         return fail
 
-    try:
-        if capture:
-            result = subprocess.run(["bash", script_path] + args, input=input_data, text=True, capture_output=True)
-            if result.returncode != 0:
-                if result.stderr:
-                    print(result.stderr, end='')
-                return None
-            return result.stdout
-        else:
-            result = subprocess.run(["bash", script_path] + args)
-            return result.returncode == 0
-    except FileNotFoundError:
-        print("\nbash: command not found.")
+    if not os.access(script_path, os.X_OK):
+        print(f"{cmd}: Permission denied.")
         return fail
+
+    try:
+        with open(script_path, "r", encoding="utf-8") as handle:
+            lines = handle.readlines()
+    except OSError as e:
+        print(f"{cmd}: cannot read script: {e}")
+        return fail
+
+    def run_lines():
+        original_stdin = sys.stdin
+        try:
+            if input_data is not None:
+                sys.stdin = io.StringIO(input_data)
+            for raw_line in lines:
+                line = raw_line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                try:
+                    execute_input_line(line)
+                except ValueError as exc:
+                    # e.g. shlex.split() on an unterminated quote in this
+                    # line. Treated like any other failing line: continue.
+                    print(f"pyash: syntax error: {exc}")
+                except Exception as exc:
+                    # Never let a bug on one line take down the rest of the script.
+                    print(f"pyash: unexpected error: {exc}")
+        finally:
+            sys.stdin = original_stdin
+
+    if capture:
+        buffer = io.StringIO()
+        with redirect_stdout(buffer):
+            run_lines()
+        return buffer.getvalue()
+
+    run_lines()
+    return True
 
 
 def run_command(cmd, args, input_data=None):
     reload_extra_commands()
 
-    if is_sh_command(cmd):
-        return run_shell_script(cmd, args, input_data=input_data, capture=True)
+    if is_pysh_command(cmd):
+        return run_pysh_script(cmd, args, input_data=input_data, capture=True)
 
     original_stdin = sys.stdin
     try:
@@ -1104,6 +1215,86 @@ def run_command(cmd, args, input_data=None):
         sys.stdin = original_stdin
 
 
+def execute_input_line(inp):
+    """
+    Parse and dispatch one line of Pyash input: && chains, | pipes, or a
+    standalone command, exactly what main()'s interactive loop does with
+    each line typed at the prompt.
+
+    Factored out of main() so it can be reused as-is by run_pysh_script():
+    """
+    inp = inp.strip()
+    if not inp:
+        return
+
+    if '&&' in inp:
+        commands_chain = [cmd.strip() for cmd in inp.split('&&')]
+        for cmd_str in commands_chain:
+            parts = shlex.split(cmd_str)
+            if not parts:
+                continue
+            cmd, *args = parts
+
+            if is_pysh_command(cmd):
+                if not run_pysh_script(cmd, args):
+                    break
+
+            elif cmd in commands:
+                commands[cmd](args)
+            elif cmd in extra_commands:
+                extra_commands[cmd](args)
+
+            else:
+                print(f"{cmd}: Command not allowed.")
+                break
+        return
+
+    if '|' in inp:
+        pipe_parts = [cmd.strip() for cmd in inp.split('|') if cmd.strip()]
+        if len(pipe_parts) < 2:
+            print("Syntax error: incomplete pipe command.")
+            return
+
+        input_data = None
+        for index, cmd_str in enumerate(pipe_parts):
+            parts = shlex.split(cmd_str)
+            if not parts:
+                continue
+            cmd, *args = parts
+
+            output = run_command(cmd, args, input_data=input_data)
+            if output is None:
+                break
+
+            if index == len(pipe_parts) - 1:
+                if output:
+                    print(output, end='')
+            else:
+                input_data = output
+        return
+
+    parts = shlex.split(inp)
+    if not parts:
+        return
+    cmd, *args = parts
+    reload_extra_commands()
+
+    if is_pysh_command(cmd):
+        run_pysh_script(cmd, args)
+        return
+
+    if cmd in commands:
+        output = run_command(cmd, args)
+        if output:
+            print(output, end='')
+    elif cmd in extra_commands:
+        output = run_command(cmd, args)
+        if output:
+            print(output, end='')
+    else:
+        print(f"{cmd}: command not found")
+
+
 def main():
     while True:
         try:
@@ -1111,73 +1302,7 @@ def main():
             if not inp:
                 continue
             add_history_entry(inp)
-
-            if '&&' in inp:
-                commands_chain = [cmd.strip() for cmd in inp.split('&&')]
-                for cmd_str in commands_chain:
-                    parts = shlex.split(cmd_str)
-                    if not parts:
-                        continue
-                    cmd, *args = parts
-
-                    if is_sh_command(cmd):
-                        if not run_shell_script(cmd, args):
-                            break
-
-                    elif cmd in commands:
-                        commands[cmd](args)
-                    elif cmd in extra_commands:
-                        extra_commands[cmd](args)
-
-                    else:
-                        print(f"{cmd}: Command not allowed.")
-                        break
-                continue
-
-            elif '|' in inp:
-                pipe_parts = [cmd.strip() for cmd in inp.split('|') if cmd.strip()]
-                if len(pipe_parts) < 2:
-                    print("Syntax error: incomplete pipe command.")
-                    continue
-
-                input_data = None
-                for index, cmd_str in enumerate(pipe_parts):
-                    parts = shlex.split(cmd_str)
-                    if not parts:
-                        continue
-                    cmd, *args = parts
-
-                    output = run_command(cmd, args, input_data=input_data)
-                    if output is None:
-                        break
-
-                    if index == len(pipe_parts) - 1:
-                        if output:
-                            print(output, end='')
-                    else:
-                        input_data = output
-                continue
-
-            parts = shlex.split(inp)
-            if not parts:
-                continue
-            cmd, *args = parts
-            reload_extra_commands()
-
-            if is_sh_command(cmd):
-                run_shell_script(cmd, args)
-                continue
-
-            if cmd in commands:
-                output = run_command(cmd, args)
-                if output:
-                    print(output, end='')
-            elif cmd in extra_commands:
-                output = run_command(cmd, args)
-                if output:
-                    print(output, end='')
-            else:
-                print(f"{cmd}: command not found")
+            execute_input_line(inp)
 
         except KeyboardInterrupt:
             print("\nExiting shell emulator.")
