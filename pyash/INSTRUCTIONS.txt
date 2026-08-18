@@ -1,6 +1,6 @@
 Pyash only works on Unix-like Operating Systems (so Linux, BSD, MacOS, etc).
 
-Please ensure that Python (3.x) and Colorama are installed prior to running Pyash.py
+Please ensure that Python (3.8+) and Colorama are installed prior to running Pyash.py
 
 (As of Pyash v1.2.0, colorama is now optional)
 (but still highly recommended if you want colored output)
@@ -22,38 +22,45 @@ General Use:
     commands. Most commands are self explanatory, but local manual pages are available
     for all commands via the "man" command (usage: man <cmd>).
 
-    Pyash has support for running ".sh" Bash files, simply be in the same directory
-    as the ".sh" file and type: "chmod +x example.sh" then type: "./example.sh".
-    You can edit ".sh" files or any other text files with the built in text editor:
-    "Pyim". (usage: pyim <file>)
+    Pyash has support for running its own native ".pysh" scripts. A ".pysh" file is
+    just a plain text file containing Pyash commands, one per line, using the exact
+    same syntax you'd type interactively (including "&&" chains and "|" pipes).
+    Lines starting with "#" are treated as comments and skipped, as are blank lines.
+    To run one, simply be in the same directory as the ".pysh" file and type:
+    "chmod +x example.pysh" then "./example.pysh". Just like a real shell, Pyash will
+    refuse to run a ".pysh" script that hasn't been made executable first.
+
+    You can edit ".pysh" files or any other text files with the built in text editor:
+    Pyim. (usage: pyim <file>)
 
 How to add custom commands:
 
-    After completing the Setup Wizard, Pyash automatically creates two hidden files
-    in your "shell" folder, ".pyash_history" and ".pyash_extras". To add your own
-    custom commands to Pyash, you must edit the ".pyash_extras" file.
+    After completing the Setup Wizard, Pyash automatically creates three hidden files
+    in your "shell" folder, ".pyash_history", ".pyash_extras", and ".pyashrc".
+    To add your own custom commands to Pyash, you must edit the ".pyash_extras" file.
     instructions on how to format your commands are noted in ".pyash_extras",
     it needs to be formated as: <command_name> [package_name]#
 
-INTENTIONAL SANDBOX BYPASSES:
+Configuring Pyash with .pyashrc:
 
-    Two features deliberately step outside the sandbox and are NOT restricted in
-    what they can do once they run. This is by design to add more functionality, not a
-    bug:
+    ".pyashrc" is a small settings file created in your "shell" folder alongside
+    ".pyash_history" and ".pyash_extras". It contains a list of directives, each
+    commented out by default with a "#". To turn a directive on, delete the leading
+    "#" from its line and save the file; Pyash rereads ".pyashrc" live, so changes
+    take effect immediately, no restart needed.
 
-    1. ./script.sh execution - the script file must resolve to a location
-      inside the shell folder, but once launched it runs under a real system
-      bash with no further restriction. It can read, write, or execute
-      anything your real user account has permission to touch.
+INTENTIONAL SANDBOX BYPASS:
 
-    2. "extras" (configured via ".pyash_extras") - lets you register a command
-      name that maps to any real executable on your system (e.g. vim,
-      python3, or even bash itself). These run as ordinary, unsandboxed
-      system processes.
+ One feature deliberately steps outside the sandbox and is NOT restricted in
+ what it can do once it runs. This is by design to add more functionality, not a bug:
 
-    Only place/run .sh scripts, and only register extras, that you trust
-    completely, they have exactly the same power as running them directly in
-    a normal terminal, sandbox folder or not.
+    "extras" (configured via ".pyash_extras") - lets you register a command
+    name that maps to any real executable on your system (e.g. vim,
+    python3, or even bash itself). These run as ordinary, unsandboxed
+    system processes.
+
+ Only register extras that you trust completely, they have exactly the same
+ power as running them directly in a normal terminal, sandbox folder or not.
 
 Q&A:
 
