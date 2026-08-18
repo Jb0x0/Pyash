@@ -5,6 +5,8 @@ Thanks for your interest in improving Pyash!
 **By contributing, you agree to follow these guidelines.**
 **If you do not agree, please do not submit pull requests or other contributions.**
 
+Also, if you haven't yet, please read Pyash's [INSTRUCTIONS.txt](https://github.com/Jb0x0/Pyash/blob/main/pyash/INSTRUCTIONS.txt)
+
 ---
 
 ## Code Contributions
