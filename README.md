@@ -20,7 +20,11 @@ Whether you are looking for an educational tool to study shell or Python mechani
   
 *  **Colored Output and Output History:** Built-in persistent history (.pyash_history) and crisp terminal color coding powered by `colorama`.
 
-*  **Support for Extra Commands:** More commands can easily be added by modifying the ".pyash_extras" file that Pyash stores in its "shell" folder
+*  **Support for Extra Commands:** More commands can easily be added by modifying the ".pyash_extras" file that Pyash stores in its "shell" folder.
+
+*  **Native `.pysh` Script Execution:** Pyash supports running native `.pysh` scripts containing Pyash commands, with support for command chaining (`&&`), stream piping (`|`), and comments.
+
+*  **Support for Configuration:** Pyash can be easily configured via the ".pyashrc" file, which is also stored in its "shell" folder.
   
 *  **Batteries-Included Utilities:** Native Python rewrites of classic coreutils:
   
@@ -68,9 +72,9 @@ Read [INSTRUCTIONS.txt](https://github.com/Jb0x0/Pyash/blob/main/pyash/INSTRUCTI
 
 ##  Prerequisites
 
-Pyash only works on Unix-like Operating Systems (so Linux, BSD, MacOS, etc).
+Pyash only works on Unix-like operating Systems (so Linux, BSD, macOS, etc).
 
-Pyash relies primarily on the Python Standard Library. You only need to install `colorama` for terminal colors:
+Pyash relies primarily on the Python Standard Library. `colorama` is optional, install it only if you want colored output:
 
 ```bash
 pip install colorama
